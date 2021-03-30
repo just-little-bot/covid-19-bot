@@ -2,7 +2,7 @@ from telegram.ext import Updater, MessageHandler, Filters, CommandHandler
 from telegram import ReplyKeyboardMarkup
 from bs4 import BeautifulSoup
 import requests
-import googletrans
+from google_trans_new import google_translator
 from time import time
 
 REQUESTS = {}
@@ -62,7 +62,6 @@ def get_stats(country):
                 f'🟩Выздоровело: {recovered}\n\n'
     # Добавляем в REQUESTS статистику по стране
     REQUESTS[country] = (to_return, time())
-    print(REQUESTS)
     return to_return
 
 
@@ -100,13 +99,9 @@ def country_handler(country):
     return f'Статистика по стране {country.capitalize()}\n\n' + stats
 
 
-def translate(text, lang='ru-en'):
-    translator = googletrans.Translator()
-
-    source_lang = lang.split('-')[0]
-    dest_lang = lang.split('-')[1]
-
-    translated_text = translator.translate(text, src=source_lang, dest=dest_lang).text.lower()
+def translate(text):
+    translator = google_translator()
+    translated_text = translator.translate(text, lang_src='ru', lang_tgt='en').lower()
     if len(translated_text.split()) < 5:
         translated_text = translated_text.split()
         translated_text = '-'.join(translated_text)
@@ -130,7 +125,7 @@ def get_top():
 
     to_return = '😷 ТОП-10 стран 😷\n\n' + '\n'.join(result)
     REQUESTS['get_top_countries'] = (to_return, time())
-    print(REQUESTS)
+
     return to_return
 
 
@@ -151,7 +146,7 @@ def new_cases():
 
     to_return = new_cases_ + new_deaths
     REQUESTS['new_cases'] = (to_return, time())
-    print(REQUESTS)
+
     return new_cases_ + new_deaths
 
 
